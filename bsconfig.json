@@ -1,0 +1,24 @@
+{
+  "name": "bs-effects",
+  "version": "0.1.0",
+  "refmt": 3,
+  "namespace": true,
+  "warnings": { "number": "-102" },
+  "sources": [{
+    "dir": "src",
+    "subdirs": true
+  }, {
+    "dir": "test",
+    "type": "dev"
+  }],
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": false
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+      "bs-mochajs",
+      "bs-jsverify",
+      "bs-abstract"
+  ]
+}
