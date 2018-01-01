@@ -27,9 +27,9 @@ bs-jsverify@^0.4.0:
   dependencies:
     jsverify "^0.8.3"
 
-bs-mochajs@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/bs-mochajs/-/bs-mochajs-0.1.0.tgz#e3dd4624f4f91544b3f098d5766157f0f96f8bf1"
+bs-mochajs@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/bs-mochajs/-/bs-mochajs-0.2.0.tgz#490e2d6367d4ab5ce1eea6bb23c54f659ea3367f"
   dependencies:
     mocha "^4.1.0"
 

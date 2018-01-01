@@ -23,7 +23,7 @@
   "license": "BSD-3-Clause",
   "devDependencies": {
     "bs-jsverify": "^0.4.0",
-    "bs-mochajs": "^0.1.0",
+    "bs-mochajs": "^0.2.0",
     "bs-platform": "^2.1.0"
   },
   "dependencies": {
