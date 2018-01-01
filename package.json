@@ -1,6 +1,6 @@
 {
   "name": "bs-effects",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Bucklescript data structures for effectful sync and async programming",
   "repository": {
     "type": "git",
