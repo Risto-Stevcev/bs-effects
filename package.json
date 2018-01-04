@@ -22,11 +22,11 @@
   "author": "Risto Stevcev",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "bs-jsverify": "^0.5.0",
+    "bs-jsverify": "^0.6.0",
     "bs-mochajs": "^0.2.0",
     "bs-platform": "^2.1.0"
   },
   "dependencies": {
-    "bs-abstract": "^0.5.0"
+    "bs-abstract": "^0.6.0"
   }
 }

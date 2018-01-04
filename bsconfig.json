@@ -16,9 +16,11 @@
     "in-source": false
   },
   "suffix": ".bs.js",
-  "bs-dependencies": [
+  "bs-dev-dependencies": [
       "bs-mochajs",
-      "bs-jsverify",
+      "bs-jsverify"
+  ],
+  "bs-dependencies": [
       "bs-abstract"
   ]
 }
