@@ -27,6 +27,8 @@
     "bs-platform": "^2.1.0"
   },
   "dependencies": {
-    "bs-abstract": "^0.8.0"
+    "bs-abstract": "^0.8.2",
+    "bs-either": "^0.1.1",
+    "bs-errors": "^0.2.0"
   }
 }

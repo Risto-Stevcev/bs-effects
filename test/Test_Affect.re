@@ -22,6 +22,16 @@ let read_file : string => affect(string) = path => (error, success) =>
     err != Js.null ? error(Js.Null.to_opt(err)) : success(content);
   });
 
+let read_file' : string => Js.Promise.t(string) = path =>
+  Js.Promise.make((~resolve, ~reject) => {
+    Fs.read_file_async(path, `utf8, (err, content) => {
+      switch (Js.Null.to_opt(err), content) {
+        | (Some(err'), _) => [@bs] reject(BsErrors.Error.unsafe_to_exception(err'))
+        | (_, content) => [@bs] resolve(content)
+      }
+    });
+  });
+
 let write_file : (string, string) => affect(unit) = (path, content) => (error, success) =>
   Fs.write_file_async(path, content, `utf8, err => {
     err != Js.null ? error(Js.Null.to_opt(err)) : success();
@@ -153,5 +163,27 @@ describe("Affect", () => Affect.Infix.({
     property1(
       "should satisfy identity", arb_nat, V.identity(pure <. string_of_int)
     );
+  });
+  describe("to_promise", () => {
+    it'("should convert to a promise", done_ => {
+      read_file("sample")
+        |> to_promise
+        |> Js.Promise.then_(result => {
+             expect(result).to_be("hello world!");
+             Js.Promise.resolve(done_())
+           })
+        |> ignore
+    })
+  });
+  describe("from_promise", () => {
+    it'("should convert from a promise", done_ => {
+      read_file'("sample")
+        |> from_promise
+        >>= (result => {
+             expect(result).to_be("hello world!");
+             pure(done_())
+           })
+        |> run_affect
+    })
   });
 }));

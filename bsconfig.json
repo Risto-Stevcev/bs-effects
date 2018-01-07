@@ -3,10 +3,10 @@
   "version": "0.5.0",
   "refmt": 3,
   "namespace": true,
-  "warnings": { "number": "-102" },
+  "warnings": { "number": "-102", "error": "+8+27" },
   "sources": [{
     "dir": "src",
-    "subdirs": true
+    "files": [ "Effect.re", "Affect.re" ]
   }, {
     "dir": "test",
     "type": "dev"
@@ -21,6 +21,8 @@
       "bs-jsverify"
   ],
   "bs-dependencies": [
+      "bs-errors",
+      "bs-either",
       "bs-abstract"
   ]
 }

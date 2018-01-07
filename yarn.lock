@@ -17,9 +17,21 @@ browser-stdout@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/browser-stdout/-/browser-stdout-1.3.0.tgz#f351d32969d32fa5d7a5567154263d928ae3bd1f"
 
-bs-abstract@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/bs-abstract/-/bs-abstract-0.8.0.tgz#1293ce3030025e5a1e6688bc37860c997a53a41a"
+bs-abstract@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/bs-abstract/-/bs-abstract-0.8.2.tgz#c390f1024dd33dd25401c44d822bf36cbee8e4a7"
+
+bs-either@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/bs-either/-/bs-either-0.1.1.tgz#dcc5a0f998f785c9e3616dbccf5d6a46b83d8666"
+  dependencies:
+    bs-abstract "^0.8.2"
+
+bs-errors@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/bs-errors/-/bs-errors-0.2.0.tgz#810541c87136c850a5b0afd898b7114603257347"
+  dependencies:
+    bs-mochajs "^0.3.0"
 
 bs-jsverify@^0.7.0:
   version "0.7.0"

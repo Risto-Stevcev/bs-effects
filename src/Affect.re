@@ -42,6 +42,35 @@ let parallel: (affect('a), affect('b)) => affect(unit) = (aff_a, aff_b) =>
 let parallel': list(affect('a)) => affect(unit) = affects =>
   (error, success) => List.iter(affect => affect(error, success), affects);
 
+[@bs.send.pipe: Js.Promise.t('a)] external promise_then_ :
+  ('a => Js.Promise.t('b), Js.Exn.t => Js.Promise.t('b)) => Js.Promise.t('b) = "then";
+
+let to_promise: affect('a) => Js.Promise.t('a) = callback =>
+  Js.Promise.make((~resolve, ~reject) => {
+    callback(
+      error => switch error {
+      | Some(error') => [@bs] reject(BsErrors.Error.unsafe_to_exception(error'))
+      | None => ()
+      },
+      success => [@bs] resolve(success)
+    )
+  });
+
+let from_promise: Js.Promise.t('a) => affect('a) = promise =>
+  (error, success) => (
+    promise_then_(
+      success' => {
+        success(success');
+        promise;
+      },
+      error' => {
+        error(Some(error'));
+        promise;
+      },
+      promise
+    ) |> ignore
+  );
+
 module Functor: FUNCTOR with type t('a) = affect('a) = {
   type t('a) = affect('a);
   let map = map;
