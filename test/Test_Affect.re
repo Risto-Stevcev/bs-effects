@@ -1,5 +1,9 @@
 open Affect;
-open BsMochajs.Mocha;
+let (describe, before) = BsMocha.Mocha.(describe, before)
+and fail = BsMocha.Assert.fail
+and it = BsMocha.Async.it;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open BsAbstract;
@@ -66,12 +70,12 @@ describe("Affect", () => Affect.Infix.({
       });
     });
     describe("Chaining effects", () => {
-      it'("should chain the async effects correctly", done_ => {
+      it("should chain the async effects correctly", done_ => {
         read_file("sample")
           >>= (content => write_file("sample", content ++ " world!"))
           >>= ((_) => read_file("sample"))
           >>= (content => {
-                expect(content).to_be("hello world!");
+                expect(content) |> to_be("hello world!");
                 done_() |> pure
               })
           |> run_affect;
@@ -79,26 +83,26 @@ describe("Affect", () => Affect.Infix.({
     });
 
     describe("Throwing effects", () => {
-      it'("should not throw if the async effect didn't fail", done_ => {
+      it("should not throw if the async effect didn't fail", done_ => {
         try ({
           Affect.throw(read_file("sample")) |> ignore;
           /* Successfully didn't throw */
           done_();
-        }) { | Js.Exn.Error(_) => should_be_ok(Js.false_) }
+        }) { | Js.Exn.Error(_) => fail("Async effect should not have failed") }
       });
 
-      it'("should throw if the async effect failed", done_ => {
+      it("should throw if the async effect failed", done_ => {
         try ({
           Affect.throw(read_file("non-existent-name")) |> ignore;
           /* Did not throw */
-          should_be_ok(Js.false_);
+          fail("Async effect should have failed");
           done_();
         }) { | Js.Exn.Error(_) => done_() }
       });
     });
 
     describe("Parallel effects", () => {
-      it'("should run effects in parallel (parallel)", done_ => {
+      it("should run effects in parallel (parallel)", done_ => {
         let x = ref("") and y = ref(0);
         let delay_ms = 500;
         let delay_x = delay(delay_ms) >>= () => { x := "foo"; pure(x^) }
@@ -107,12 +111,12 @@ describe("Affect", () => Affect.Infix.({
         parallel(delay_x, delay_y) >>= (() => pure()) |> run_affect;
 
         Js.Global.setTimeout(() => {
-          expect(x^).to_be("foo");
-          expect(y^).to_be(123);
+          expect(x^) |> to_be("foo");
+          expect(y^) |> to_be(123);
           done_()
         }, delay_ms) |> ignore;
       });
-      it'("should run effects in parallel (parallel')", done_ => {
+      it("should run effects in parallel (parallel')", done_ => {
         let x = ref("") and y = ref("");
         let delay_ms = 500;
         let delay_x = delay(delay_ms) >>= () => { x := "foo"; pure() }
@@ -121,8 +125,8 @@ describe("Affect", () => Affect.Infix.({
         parallel'([delay_x, delay_y]) |> run_affect;
 
         Js.Global.setTimeout(() => {
-          expect(x^).to_be("foo");
-          expect(y^).to_be("bar");
+          expect(x^) |> to_be("foo");
+          expect(y^) |> to_be("bar");
           done_()
         }, delay_ms) |> ignore;
       });
@@ -165,22 +169,22 @@ describe("Affect", () => Affect.Infix.({
     );
   });
   describe("to_promise", () => {
-    it'("should convert to a promise", done_ => {
+    it("should convert to a promise", done_ => {
       read_file("sample")
         |> to_promise
         |> Js.Promise.then_(result => {
-             expect(result).to_be("hello world!");
+             expect(result) |> to_be("hello world!");
              Js.Promise.resolve(done_())
            })
         |> ignore
     })
   });
   describe("from_promise", () => {
-    it'("should convert from a promise", done_ => {
+    it("should convert from a promise", done_ => {
       read_file'("sample")
         |> from_promise
         >>= (result => {
-             expect(result).to_be("hello world!");
+             expect(result) |> to_be("hello world!");
              pure(done_())
            })
         |> run_affect

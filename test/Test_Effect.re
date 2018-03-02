@@ -1,5 +1,7 @@
 open Effect;
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open BsAbstract;
@@ -50,7 +52,7 @@ describe("Effect", () => Effect.Infix.({
         read_file("sample")
           >>= (content => write_file("sample", content ++ " world!"))
           >>= ((_) => read_file("sample"))
-          >>= (content => expect(content).to_be("hello world!") |> pure)
+          >>= (content => expect(content) |> to_be("hello world!") |> pure)
           |> run_effect;
       });
       it("should flat_map correctly", () => {
@@ -60,7 +62,7 @@ describe("Effect", () => Effect.Infix.({
             >>= (b => b == 456 ? pure("foo") : pure("bar"))
             <#> flip((++))("!")
           |> run_effect
-        ).to_be("foo!");
+        ) |> to_be("foo!");
       });
       it("should be idempotent", () => {
         let x = ref(123);
@@ -71,10 +73,10 @@ describe("Effect", () => Effect.Infix.({
           add_to_x(i) |> ignore;
         };
         let result = add_to_x(0);
-        expect(run_effect(result)).to_be(123);
+        expect(run_effect(result)) |> to_be(123);
 
         /* Doing a flat_map will chain the effects together */
-        expect(run_effect(pure(x) >>= x => add_to_x(x^))).to_be(246)
+        expect(run_effect(pure(x) >>= x => add_to_x(x^))) |> to_be(246)
       });
     });
   });

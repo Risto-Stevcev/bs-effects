@@ -17,12 +17,12 @@
   },
   "suffix": ".bs.js",
   "bs-dev-dependencies": [
-      "bs-mochajs",
-      "bs-jsverify"
+    "bs-chai",
+    "bs-mocha",
+    "bs-jsverify"
   ],
   "bs-dependencies": [
-      "bs-errors",
-      "bs-either",
-      "bs-abstract"
+    "bs-errors",
+    "bs-abstract"
   ]
 }
