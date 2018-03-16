@@ -1,6 +1,6 @@
 {
   "name": "bs-effects",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Bucklescript data structures for effectful sync and async programming",
   "repository": {
     "type": "git",
@@ -22,13 +22,13 @@
   "author": "Risto Stevcev",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "bs-chai": "^0.2.0",
-    "bs-jsverify": "^0.8.1",
-    "bs-mocha": "^0.2.0",
-    "bs-platform": "^2.1.0"
+    "bs-chai": "^0.3.0",
+    "bs-jsverify": "^0.9.0",
+    "bs-mocha": "^0.3.0",
+    "bs-platform": "^2.2.2"
   },
   "dependencies": {
-    "bs-abstract": "^0.12.0",
-    "bs-errors": "^0.3.0"
+    "bs-abstract": "^0.13.0",
+    "bs-errors": "^0.4.0"
   }
 }

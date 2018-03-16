@@ -1,6 +1,6 @@
 {
   "name": "bs-effects",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "refmt": 3,
   "namespace": true,
   "warnings": { "number": "-102", "error": "+8+27" },

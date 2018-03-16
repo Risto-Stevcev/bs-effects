@@ -23,13 +23,13 @@ let dirname' = Js.Option.getWithDefault(".", dirname);
 
 let read_file : string => affect(string) = path => (error, success) =>
   Fs.read_file_async(path, `utf8, (err, content) => {
-    err != Js.null ? error(Js.Null.to_opt(err)) : success(content);
+    err != Js.null ? error(Js.Null.toOption(err)) : success(content);
   });
 
 let read_file' : string => Js.Promise.t(string) = path =>
   Js.Promise.make((~resolve, ~reject) => {
     Fs.read_file_async(path, `utf8, (err, content) => {
-      switch (Js.Null.to_opt(err), content) {
+      switch (Js.Null.toOption(err), content) {
         | (Some(err'), _) => [@bs] reject(BsErrors.Error.unsafe_to_exception(err'))
         | (_, content) => [@bs] resolve(content)
       }
@@ -38,7 +38,7 @@ let read_file' : string => Js.Promise.t(string) = path =>
 
 let write_file : (string, string) => affect(unit) = (path, content) => (error, success) =>
   Fs.write_file_async(path, content, `utf8, err => {
-    err != Js.null ? error(Js.Null.to_opt(err)) : success();
+    err != Js.null ? error(Js.Null.toOption(err)) : success();
   });
 
 let delay : int => affect(unit) = ms => (_, success) =>
