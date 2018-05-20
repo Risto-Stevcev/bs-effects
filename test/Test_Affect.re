@@ -10,7 +10,8 @@ open BsAbstract;
 module Fn = BsAbstract.Functions.Monad(Affect.Monad);
 let (flip, const) = Function.(flip, const);
 let ((<.), (>.)) = Function.Infix.((<.), (>.));
-let (<=<) = Fn.compose_kliesli;
+let ((>>=), (<#>), (>=>)) = Affect.Infix.((>>=), (<#>), (>=>));
+
 
 module CompareAffect = {
   let (>>=) = Affect.Infix.(>>=);
@@ -23,63 +24,62 @@ let dirname' = Js.Option.getWithDefault(".", dirname);
 
 let read_file : string => affect(string) = path => (error, success) =>
   Fs.read_file_async(path, `utf8, (err, content) => {
-    err != Js.null ? error(Js.Null.toOption(err)) : success(content);
-  });
+    err != Js.null ? error(Js.Null.toOption(err)) : success(content)
+  })
 
-let read_file' : string => Js.Promise.t(string) = path =>
+and read_file' : string => Js.Promise.t(string) = path =>
   Js.Promise.make((~resolve, ~reject) => {
     Fs.read_file_async(path, `utf8, (err, content) => {
       switch (Js.Null.toOption(err), content) {
-        | (Some(err'), _) => [@bs] reject(BsErrors.Error.unsafe_to_exception(err'))
-        | (_, content) => [@bs] resolve(content)
+      | (Some(err'), _) => [@bs] reject(BsErrors.Error.unsafe_to_exception(err'))
+      | (_, content) => [@bs] resolve(content)
       }
-    });
-  });
+    })
+  })
 
-let write_file : (string, string) => affect(unit) = (path, content) => (error, success) =>
+and write_file : (string, string) => affect(unit) = (path, content) => (error, success) =>
   Fs.write_file_async(path, content, `utf8, err => {
-    err != Js.null ? error(Js.Null.toOption(err)) : success();
-  });
+    err != Js.null ? error(Js.Null.toOption(err)) : success()
+  })
 
-let delay : int => affect(unit) = ms => (_, success) =>
+and delay : int => affect(unit) = ms => (_, success) =>
   Js.Global.setTimeout(() => success(), ms) |> ignore;
 
 
-describe("Affect", () => Affect.Infix.({
-  before(() => {
-    Fs.write_file_sync("sample", "hello", `utf8);
-  });
+describe("Affect", () => {
+  before(() => Fs.write_file_sync("sample", "hello", `utf8));
 
   describe("Sanity check", () => {
     describe("Monoid in the category of endofunctors", () => {
       property1("should satisfy associativity and identity", arb_nat, x => {
         module Monoid: BsAbstract.Interface.MONOID with type t = int => affect(int) = {
           type t = int => affect(int);
-          let append = (<=<);
-          let empty = a => Affect.Monad.pure(a);
+          let append = (>=>)
+          and empty = a => Affect.Monad.pure(a)
         };
         module Compare: BsAbstract.Interface.EQ with type t = int => affect(int) = {
           type t = int => affect(int);
-          let eq = (a, b) =>
-            run_affect(a(x) >>= (_) => pure()) == run_affect(b(x) >>= (_) => pure())
+          let eq = (a, b) => run_affect(a(x) >>= (_) => pure()) == run_affect(b(x) >>= (_) => pure())
         };
+
         module Verify_Semigroup = Verify.Compare.Semigroup(Monoid, Compare);
         module Verify_Monoid = Verify.Compare.Monoid(Monoid, Compare);
         Verify_Semigroup.associativity(pure <. (*)(3), pure <. (+)(2), pure <. (-)(1)) &&
         Verify_Monoid.identity(pure)
-      });
+      })
     });
+
     describe("Chaining effects", () => {
       it("should chain the async effects correctly", done_ => {
         read_file("sample")
-          >>= (content => write_file("sample", content ++ " world!"))
-          >>= ((_) => read_file("sample"))
-          >>= (content => {
-                expect(content) |> to_be("hello world!");
-                done_() |> pure
-              })
-          |> run_affect;
-      });
+        >>= (content => write_file("sample", content ++ " world!"))
+        >>= ((_) => read_file("sample"))
+        >>= (content => {
+              expect(content) |> to_be("hello world!");
+              done_() |> pure
+            })
+        |> run_affect
+      })
     });
 
     describe("Throwing effects", () => {
@@ -87,7 +87,7 @@ describe("Affect", () => Affect.Infix.({
         try ({
           Affect.throw(read_file("sample")) |> ignore;
           /* Successfully didn't throw */
-          done_();
+          done_()
         }) { | Js.Exn.Error(_) => fail("Async effect should not have failed") }
       });
 
@@ -96,9 +96,9 @@ describe("Affect", () => Affect.Infix.({
           Affect.throw(read_file("non-existent-name")) |> ignore;
           /* Did not throw */
           fail("Async effect should have failed");
-          done_();
+          done_()
         }) { | Js.Exn.Error(_) => done_() }
-      });
+      })
     });
 
     describe("Parallel effects", () => {
@@ -114,7 +114,7 @@ describe("Affect", () => Affect.Infix.({
           expect(x^) |> to_be("foo");
           expect(y^) |> to_be(123);
           done_()
-        }, delay_ms) |> ignore;
+        }, delay_ms) |> ignore
       });
       it("should run effects in parallel (parallel')", done_ => {
         let x = ref("") and y = ref("");
@@ -128,10 +128,11 @@ describe("Affect", () => Affect.Infix.({
           expect(x^) |> to_be("foo");
           expect(y^) |> to_be("bar");
           done_()
-        }, delay_ms) |> ignore;
-      });
+        }, delay_ms) |> ignore
+      })
     })
   });
+
   describe("Functor", () => {
     module V = BsAbstract.Verify.Compare.Functor(Affect.Functor, CompareAffect);
     property1("should satisfy identity", arb_nat, pure >. V.identity);
@@ -139,6 +140,7 @@ describe("Affect", () => Affect.Infix.({
       V.composition((++)("!"), string_of_int, pure(a))
     })
   });
+
   describe("Apply", () => {
     module V = Verify.Compare.Apply(Affect.Monad, CompareAffect);
     property1(
@@ -147,6 +149,7 @@ describe("Affect", () => Affect.Infix.({
       pure >. V.associative_composition(pure((++)("!")), pure(string_of_int))
     )
   });
+
   describe("Applicative", () => {
     module V = Verify.Compare.Applicative(Affect.Applicative, CompareAffect);
     property1("should satisfy identity", arb_nat, pure >. V.identity);
@@ -155,8 +158,9 @@ describe("Affect", () => Affect.Infix.({
       arb_array(arb_nat),
       V.homomorphism(Array.Functor.map(string_of_int))
     );
-    property1("should satisfy interchange", arb_nat, V.interchange(pure(string_of_int)));
+    property1("should satisfy interchange", arb_nat, V.interchange(pure(string_of_int)))
   });
+
   describe("Monad", () => {
     module V = Verify.Compare.Monad(Affect.Monad, CompareAffect);
     property1(
@@ -164,30 +168,30 @@ describe("Affect", () => Affect.Infix.({
       arb_nat,
       pure >. V.associativity(pure <. string_of_int, pure <. (++)("!"))
     );
-    property1(
-      "should satisfy identity", arb_nat, V.identity(pure <. string_of_int)
-    );
+    property1("should satisfy identity", arb_nat, V.identity(pure <. string_of_int))
   });
+
   describe("to_promise", () => {
     it("should convert to a promise", done_ => {
       read_file("sample")
-        |> to_promise
-        |> Js.Promise.then_(result => {
-             expect(result) |> to_be("hello world!");
-             Js.Promise.resolve(done_())
-           })
-        |> ignore
+      |> to_promise
+      |> Js.Promise.then_(result => {
+           expect(result) |> to_be("hello world!");
+           Js.Promise.resolve(done_())
+         })
+      |> ignore
     })
   });
+
   describe("from_promise", () => {
     it("should convert from a promise", done_ => {
       read_file'("sample")
-        |> from_promise
-        >>= (result => {
-             expect(result) |> to_be("hello world!");
-             pure(done_())
-           })
-        |> run_affect
+      |> from_promise
+      >>= (result => {
+           expect(result) |> to_be("hello world!");
+           pure(done_())
+         })
+      |> run_affect
     })
-  });
-}));
+  })
+})
