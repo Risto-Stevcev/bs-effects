@@ -10,8 +10,8 @@
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
-    "test": "./node_modules/.bin/mocha lib/js/test/Test*.js",
-    "test:watch": "./node_modules/.bin/mocha -w lib/js/test/Test*.js"
+    "test": "mocha lib/js/test/Test*.js",
+    "test:watch": "mocha -w lib/js/test/Test*.js"
   },
   "homepage": "https://github.com/Risto-Stevcev/bs-effects",
   "bugs": "https://github.com/Risto-Stevcev/bs-effects/issues",
@@ -22,13 +22,13 @@
   "author": "Risto Stevcev",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "bs-chai": "^0.3.0",
-    "bs-jsverify": "^0.9.0",
-    "bs-mocha": "^0.3.0",
-    "bs-platform": "^2.2.2"
+    "bs-chai": "^0.4.0",
+    "bs-jsverify": "^0.10.0",
+    "bs-mocha": "^0.4.0",
+    "bs-platform": "^4.0.0"
   },
   "dependencies": {
-    "bs-abstract": "^0.15.0",
-    "bs-errors": "^0.4.0"
+    "bs-abstract": "^0.16.0",
+    "bs-errors": "^0.5.0"
   }
 }
