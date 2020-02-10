@@ -97,7 +97,13 @@ describe("Affect", () => {
           /* Did not throw */
           fail("Async effect should have failed");
           done_()
-        }) { | Js.Exn.Error(_) => done_() }
+        }) { | Js.Exn.Error(e) => {
+          switch (Js.Exn.message(e)) {
+            | Some(message) => expect(message) |> to_match([%bs.re "/ENOENT/g"])
+            | _ => fail("Expected error was not thrown")
+          }
+          done_()
+        }}
       })
     });
 
